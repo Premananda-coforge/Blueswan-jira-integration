@@ -1,68 +1,47 @@
-// import React from 'react';
 import React, { useEffect, useState } from 'react';
-import ForgeReconciler, { Text } from '@forge/react';
+import ForgeReconciler, { Text , Button} from '@forge/react';
 import { invoke } from '@forge/bridge';
-
-// const updateIssue = async () => {
-//   try {
-//     const result = await invoke('updateJiraStory', {
-//       fieldsToUpdate: {
-//         summary: "Updated from Forge app using context",
-//         description: {
-//           type: "doc",
-//           version: 1,
-//           content: [{
-//             type: "paragraph",
-//             content: [{
-//               type: "text",
-//               text: "This was updated using the current issue key"
-//             }]
-//           }]
-//         }
-//       }
-//     });
-//     console.log(result.message);
-//   } catch (err) {
-//     console.error("Failed to update issue:", err);
-//   }
-// };
-// 
-// export default function App() {
-//   return (
-//     <div>
-//       <button onClick={updateIssue}>Update Current Issue</button>
-//     </div>
-//   );
-// }
+import { view } from "@forge/bridge";
 
 export default function App() {
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState("Processing...");
+  const [status, setStatus] = useState("Initializing...");
 
   useEffect(() => {
-    async function callApi() {
+    async function enhanceAndUpdate() {
       try {
-            const result = await invoke('updateJiraStory', {
-      fieldsToUpdate: {
-    "summary": "Summary updated using forge app",
-    "description": "Description updated using forge app"
-}
-    });
-    console.log(result.message);
-  } catch (err) {
-    console.error("Failed to update issue:", err);
-  }
+        setStatus("Fetching issue context...");
+        const issueKey = await invoke("getIssueKey");
+
+        const issueData = await invoke("getIssueDetails",{issueKey} );
+
+        setStatus("Calling backend to enhance & update...");
+        const response = await invoke('enhanceAndUpdate', {
+  issueKey,
+  userStoryData: issueData
+});
+
+        setResult(response.message || "No description returned.");
+        setStatus("Done!");
+      } catch (err) {
+
+
+        console.error("Failed to process story:", err);
+        setStatus("Error: " + err.message);
+      }
     }
 
-    callApi();
+    enhanceAndUpdate();
   }, []);
 
   return (
     <>
-      <Text>Fixing the story with Blueswan!</Text>
+      <Text>Auto-refining the Jira story using AI</Text>
+      <Text>Status: {status}</Text>
       <Text>{result}</Text>
     </>
   );
-};
+}
 
 ForgeReconciler.render(
   <React.StrictMode>

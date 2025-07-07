@@ -4,8 +4,7 @@ modules:
       resource: main
       render: native
       title: Improve Story
-      # icon: https://developer.atlassian.com/platform/forge/images/icons/issue-panel-icon.svg
-      icon: ./hsbc-icon.png
+      icon: https://raw.githubusercontent.com/Premananda-coforge/Blueswan-jira-integration/refs/heads/main/hsbc-icon.svg
       resolver:
         function: main-resolver
   function:
@@ -21,6 +20,11 @@ permissions:
     - write:jira-work
     - read:jira-work
     - read:jira-user
+  external:
+    fetch:
+      backend:
+        - https://jsonplaceholder.typicode.com
+        - https://worktop.cigniti.com/api/hsbc/enhance/enhanceUserStory
 
 app:
   id: ari:cloud:ecosystem::app/ff04f33c-cb10-4d08-9bf5-4f214c828d24
