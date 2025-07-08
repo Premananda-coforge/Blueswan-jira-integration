@@ -1,9 +1,9 @@
 modules:
   jira:issuePanel:
-    - key: improve-story
+    - key: enhance-story
       resource: main
       render: native
-      title: Improve Story
+      title: Enhance Story
       icon: https://raw.githubusercontent.com/Premananda-coforge/Blueswan-jira-integration/refs/heads/main/hsbc-icon.svg
       resolver:
         function: main-resolver
@@ -23,11 +23,11 @@ permissions:
   external:
     fetch:
       backend:
-        - https://jsonplaceholder.typicode.com
         - https://worktop.cigniti.com/api/hsbc/enhance/enhanceUserStory
 
 app:
-  id: ari:cloud:ecosystem::app/ff04f33c-cb10-4d08-9bf5-4f214c828d24
+  # id: ari:cloud:ecosystem::app/ff04f33c-cb10-4d08-9bf5-4f214c828d24
+  id: ari:cloud:ecosystem::app/7c0da086-b45c-4145-86f4-6756f9858ecb
   runtime:
     name: nodejs22.x
     memoryMB: 256

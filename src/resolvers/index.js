@@ -36,22 +36,83 @@ resolver.define('getIssueDetails', async ({ payload }) => {
   }
 });
 
+resolver.define('fetchAttachments', async ({ payload }) => {
+  const issueData = payload;
+  console.log("Fetching attachments for issue:", issueData);
+  const attachments = [];
+
+  if (!issueData || !issueData.fields || !Array.isArray(issueData.fields.attachment)) {
+    return attachments;
+  }
+  console.log("Attachments found:", issueData.fields);
+
+  for (const att of issueData.fields.attachment) {
+    let contentBase64 = "";
+
+    if (att.id) {
+      try {
+        const response = await api
+          .asApp()
+          .requestJira(route`/rest/api/2/attachment/content/${att.id}`, {
+            method: "GET",
+            headers: {
+              Accept: "application/json"
+            }
+          });
+        console.log("Response for attachment content:", response);
+
+        if (response.ok) {
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          contentBase64 = buffer.toString("base64");
+        } else {
+          console.error(`Failed to fetch attachment content for id ${att.id}`);
+        }
+      } catch (err) {
+        console.error(`Error fetching attachment content for id ${att.id}:`, err);
+      }
+    }
+
+    attachments.push({
+      file_name: att.filename || "No Attachment",
+      content_type: att.mimeType || "string",
+      content: contentBase64
+    });
+  }
+
+  console.log("Fetched attachments:", attachments);
+  return attachments;
+});
+
+
 resolver.define('enhanceAndUpdate', async ({ payload }) => {
-  const { issueKey, userStoryData } = payload;
-  const enhanceReqPayload = mapIssueToRequestPayload(userStoryData);
+  const { issueKey, userStoryData, attachments } = payload;
+  const enhanceReqPayload = mapIssueToRequestPayload(userStoryData, attachments);
   console.log("Enhance request payload is :", enhanceReqPayload);
 
   try {
     // Step 1: Enhance
     console.log("Calling Enhance API...");
-    const formData = new FormData();
+    const useFormData = false; // Set this flag to true for FormData, false for JSON
 
-    formData.append("enhance_payload_base_model", JSON.stringify(enhanceReqPayload));
-    formData.append("files", new Blob([]));
+    let body;
+    let headers = {};
+
+    if (useFormData) {
+      const formData = new FormData();
+      formData.append("enhance_payload_base_model", JSON.stringify(enhanceReqPayload));
+      formData.append("files", new Blob([]));
+      body = formData;
+      // No need to set Content-Type for FormData; browser/Fetch will set it
+    } else {
+      body = JSON.stringify(enhanceReqPayload);
+      headers["Content-Type"] = "application/json";
+    }
 
     const enhanceRes = await fetch("https://worktop.cigniti.com/api/hsbc/enhance/enhanceUserStory", {
       method: "POST",
-      body: formData
+      headers: headers,
+      body: body
     });
 
     const enhanced = await enhanceRes.text();

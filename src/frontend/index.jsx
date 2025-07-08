@@ -15,10 +15,14 @@ export default function App() {
 
         const issueData = await invoke("getIssueDetails",{issueKey} );
 
+        setStatus("Fetching attachments...");
+        const attachments = await invoke("fetchAttachments",issueData);
+
         setStatus("Calling backend to enhance & update...");
         const response = await invoke('enhanceAndUpdate', {
   issueKey,
-  userStoryData: issueData
+  userStoryData: issueData,
+  attachments
 });
 
         setResult(response.message || "No description returned.");
@@ -36,7 +40,7 @@ export default function App() {
 
   return (
     <>
-      <Text>Auto-refining the Jira story using AI</Text>
+      <Text>Auto-refining the Jira story with Blueswan</Text>
       <Text>Status: {status}</Text>
       <Text>{result}</Text>
     </>

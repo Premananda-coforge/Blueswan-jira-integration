@@ -1,9 +1,13 @@
+import { Buffer } from "buffer";
+import api, { route, fetch } from '@forge/api';
 
-export function mapIssueToRequestPayload(issueData) {
+export function mapIssueToRequestPayload(issueData, attachments) {
   if (!issueData || !issueData.fields) {
     throw new Error("Invalid issue data");
   }
 
+    console.log("Issue data received:", issueData);
+    console.log("Attachments processed:", attachments);
   return {
     request_from: "HSBC",
     user_story_details: [
@@ -14,13 +18,13 @@ export function mapIssueToRequestPayload(issueData) {
         status: "Original",
         source_type: "Jira",
         datasource_project_name: issueData.fields.project?.name || "Unknown Project",
-        epic_id: issueData.fields.customfield_10008 || null, // Replace with actual Epic ID field if needed
+        epic_id: issueData.fields.customfield_10008 || null,
         epic_title: null,
         feature_id: null,
         feature_title: null,
         area_path: `${issueData.fields.project?.name || "Project"}\\Worktop`,
         us_run_status: null,
-        acceptance_criteria: getAcceptanceCriteria(), // Function below
+        acceptance_criteria: getAcceptanceCriteria(),
         description: issueData.fields.description || null,
         quality: null,
         cost: null,
@@ -44,14 +48,19 @@ export function mapIssueToRequestPayload(issueData) {
         created_by: issueData.fields.creator?.name || "Unknown",
         updated_by: "Blueswan",
         impact_status: false,
-        file_attachment_details: []
+        file_attachment_details: attachments
       }
     ]
   };
 }
 
 function getAcceptanceCriteria() {
-  return `acceptance criteria hardcoded`;
+  // Try to get acceptance criteria from a custom field (adjust the field key as needed)
+  // Common Jira custom field keys: customfield_XXXXX
+  return "Acceptance criteria written inside description";
+    // issueData.fields.customfield_10092
+    // issueData.fields.acceptanceCriteria
+  
 }
 
 export function mapAIResponseToJiraPayload(responseFromAI) {
@@ -59,8 +68,8 @@ export function mapAIResponseToJiraPayload(responseFromAI) {
     throw new Error("Invalid issue data");
   }
 
-  const completeDescription = `${responseFromAI.description}\n\n**Acceptance Criteria**\n${responseFromAI.acceptance_criteria}`;
-  console.log("completeDescription : ", completeDescription);
+  const completeDescription = `${responseFromAI.description}\n\n*Acceptance Criteria*\n${responseFromAI.acceptance_criteria}`;
+
   return {
     fields: {
       summary: responseFromAI.user_story_title,
