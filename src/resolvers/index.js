@@ -1,6 +1,6 @@
 import Resolver from '@forge/resolver';
 import api, { route, fetch } from '@forge/api';
-import { mapIssueToRequestPayload, mapAIResponseToJiraPayload } from './utils.js';
+import { mapIssueToEnhanceRequestPayload, mapAIResponseToJiraPayload,mapIssueToAnalyzeRequestPayload } from './utils.js';
 
 const resolver = new Resolver();
 
@@ -87,7 +87,7 @@ resolver.define('fetchAttachments', async ({ payload }) => {
 
 resolver.define('enhanceAndUpdate', async ({ payload }) => {
   const { issueKey, userStoryData, attachments } = payload;
-  const enhanceReqPayload = mapIssueToRequestPayload(userStoryData, attachments);
+  const enhanceReqPayload = mapIssueToEnhanceRequestPayload(userStoryData, attachments);
   console.log("Enhance request payload is :", enhanceReqPayload);
 
   try {
@@ -154,7 +154,7 @@ try {
     }
 
     return {
-      message: "Jira issue updated successfully!"
+      message: "✅ Jira issue enhanced successfully!"
     };
 
   } catch (error) {
@@ -162,6 +162,38 @@ try {
     throw error;
   }
 });
+
+// resolver.define('analyze', async ({ payload }) => {
+//   const { issueKey, userStoryData, attachments } = payload;
+//   const analyzeReqPayload = mapIssueToAnalyzeRequestPayload(userStoryData, attachments);
+//   console.log("Analyze request payload is :", analyzeReqPayload);
+
+//   const body = JSON.stringify(analyzeReqPayload);
+//   const headers = ["Content-Type"] = "application/json";
+
+//   try {
+//     const analyzeRes = await fetch("https://worktop.cigniti.com/api/hsbc/analyze/analyzeUserStory", {
+//       method: "POST",
+//       headers: headers,
+//       body: body
+//     });
+
+//     if (!response.ok) {
+//       const errorText = await response.text();
+//       console.error(`Failed to analyze the issue: ${response.status} - ${errorText}`);
+//       throw new Error(`Unable to analyze the issue: ${response.status}`);
+//     }
+
+//     const analyzed = await analyzeRes.json();
+//     const ambiguity = analyzed.data.ambiguity;
+//     return ambiguity;
+
+
+//   } catch (error) {
+//     console.error("Error in alalyzing the issue:", error);
+//     throw error;
+//   }
+// });
 
 
 // Export for Forge runtime

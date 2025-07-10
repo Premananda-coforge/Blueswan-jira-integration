@@ -24,6 +24,7 @@ permissions:
     fetch:
       backend:
         - https://worktop.cigniti.com/api/hsbc/enhance/enhanceUserStory
+        # - https://worktop.cigniti.com/api/hsbc/analyze/analyzeUserStory
 
 app:
   # id: ari:cloud:ecosystem::app/ff04f33c-cb10-4d08-9bf5-4f214c828d24
