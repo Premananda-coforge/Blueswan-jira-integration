@@ -68,6 +68,7 @@ export function mapAIResponseToJiraPayload(responseFromAI) {
     throw new Error("Invalid issue data");
   }
 
+  console.log("AI response received:", responseFromAI);
   const completeDescription = `${responseFromAI.description}\n\n*Acceptance Criteria*\n${responseFromAI.acceptance_criteria}`;
 
   return {
@@ -78,7 +79,7 @@ export function mapAIResponseToJiraPayload(responseFromAI) {
     update: {
       labels: [
         {
-          "add": "Enhanced"
+          "add": responseFromAI.status
         }
       ]
     }
