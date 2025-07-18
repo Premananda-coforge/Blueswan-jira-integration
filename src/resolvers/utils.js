@@ -86,6 +86,25 @@ export function mapAIResponseToJiraPayload(responseFromAI) {
   };
 }
 
+// export function formatMultilineText(text) {
+//   if (!text) return "No description available.";
+
+//   return text.split('\n').map((line, index) => {
+//     // Add spacing between paragraphs
+//     if (line.trim() === '') {
+//       return <br key={`br-${index}`} />;
+//     }
+
+//     return (
+//       <React.Fragment key={index}>
+//         {line}
+//         <br />
+//       </React.Fragment>
+//     );
+//   });
+// }
+
+
 // export function mapIssueToAnalyzeRequestPayload(issueData, attachments) {
 //   if (!issueData || !issueData.fields) {
 //     throw new Error("Invalid issue data");

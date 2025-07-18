@@ -1,6 +1,6 @@
 import Resolver from '@forge/resolver';
 import api, { route, fetch } from '@forge/api';
-import { mapIssueToEnhanceRequestPayload, mapAIResponseToJiraPayload,mapIssueToAnalyzeRequestPayload } from './utils.js';
+import { mapIssueToEnhanceRequestPayload, mapAIResponseToJiraPayload, mapIssueToAnalyzeRequestPayload } from './utils.js';
 
 const resolver = new Resolver();
 
@@ -140,6 +140,41 @@ try {
     }
     console.log("Updating Jira issue:", issueKey);
     const jiraPayload = mapAIResponseToJiraPayload(matchingStory);
+    // const res = enhanceIssue(jiraPayload);
+    // console.log("Enhancement response:", res);
+    return jiraPayload;
+   
+    // const updateRes = await api.asApp().requestJira(route`/rest/api/2/issue/${issueKey}`, {
+    //   method: "PUT",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(jiraPayload)
+    // });
+
+    // if (!updateRes.ok) {
+    //   const errorText = await updateRes.text();
+    //   console.error("Failed to update issue:", errorText);
+    //   throw new Error(`Update failed: ${updateRes.status}`);
+    // }
+
+    // return {
+    //   message: "✅ Jira issue enhanced successfully!"
+    // };
+
+  } catch (error) {
+    console.error("Error in enhanceAndUpdate:", error);
+    throw error;
+  }
+});
+
+resolver.define('updateIssue', async ( {payload} ) => {
+
+  const { issueKey, jiraPayload } = payload;
+
+  console.log("Enhancing issue with payload:", jiraPayload);
+  console.log("Issuekey:", issueKey);
+
+  try {
+    // const jiraPayload = mapAIResponseToJiraPayload(matchingStory);
    
     const updateRes = await api.asApp().requestJira(route`/rest/api/2/issue/${issueKey}`, {
       method: "PUT",
@@ -158,10 +193,17 @@ try {
     };
 
   } catch (error) {
-    console.error("Error in enhanceAndUpdate:", error);
+    console.error("Error in getIssueDetails:", error);
     throw error;
   }
+
 });
+
+// resolver.define('format', async ({ payload }) => {
+//   const formattedText = formatMultilineText(payload);
+//   console.log("Formatted text:", formattedText);
+//   return formattedText;
+// });
 
 // resolver.define('analyze', async ({ payload }) => {
 //   const { issueKey, userStoryData, attachments } = payload;
